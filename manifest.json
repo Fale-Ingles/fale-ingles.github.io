@@ -1,0 +1,15 @@
+{
+  "name": "Finn English — Aprenda inglês todo dia",
+  "short_name": "Finn English",
+  "description": "Aprenda inglês com cartões, pronúncia, quiz e conversas, um pouquinho por dia.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#faf7ff",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
