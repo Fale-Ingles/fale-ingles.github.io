@@ -406,15 +406,6 @@
       <button class="block" id="setSave" style="margin-top:16px">Salvar</button>
     </div>
     <div class="card">
-      <div class="label">Versão Pro</div>
-      <p style="margin:4px 0 10px;color:var(--muted);font-size:13px">Desbloqueie os baralhos Pro (phrasal verbs e gírias) e apoie o projeto.</p>
-      <input type="text" id="setProCode" placeholder="Código Pro (ex.: FINN2026)">
-      <div class="row" style="margin-top:10px">
-        <button class="ghost grow" id="setProApply">Ativar código</button>
-        <span class="pill" id="setProStatus">Grátis</span>
-      </div>
-    </div>
-    <div class="card">
       <div class="label">Backup</div>
       <button class="ghost block" id="setExport">⬇️ Exportar progresso</button>
       <button class="ghost block" id="setImport">⬆️ Importar progresso</button>
@@ -775,7 +766,7 @@ const DECKS=[
     {en:"buy / bought",pt:"comprar / comprou",ex:"She bought a new phone."},
     {en:"write / wrote",pt:"escrever / escreveu",ex:"He wrote a letter."}
   ]},
-  {id:"phrasal",title:"Phrasal verbs",emoji:"🧩",level:"adv",pro:true,words:[
+  {id:"phrasal",title:"Phrasal verbs",emoji:"🧩",level:"adv",words:[
     {en:"wake up",pt:"acordar",ex:"I wake up at six."},
     {en:"get up",pt:"levantar",ex:"Get up, it is late!"},
     {en:"look for",pt:"procurar",ex:"I am looking for my keys."},
@@ -787,7 +778,7 @@ const DECKS=[
     {en:"run out of",pt:"ficar sem",ex:"We ran out of milk."},
     {en:"come back",pt:"voltar",ex:"Please come back soon."}
   ]},
-  {id:"slang",title:"Gírias e expressões",emoji:"😎",level:"adv",pro:true,words:[
+  {id:"slang",title:"Gírias e expressões",emoji:"😎",level:"adv",words:[
     {en:"what's up?",pt:"e aí?",ex:"Hey, what's up?"},
     {en:"cool",pt:"legal",ex:"That is really cool!"},
     {en:"hang out",pt:"sair / curtir",ex:"Let's hang out this weekend."},
@@ -974,7 +965,7 @@ function dayNumber(){return Math.floor(new Date(todayStr()+"T00:00:00").getTime(
 function levelInfo(xp){let lvl=0;for(let i=0;i<LEVELS.length;i++){if(xp>=LEVELS[i])lvl=i;else break}const cur=LEVELS[lvl],next=LEVELS[lvl+1]!=null?LEVELS[lvl+1]:null;const pct=next?Math.min(100,Math.round((xp-cur)/(next-cur)*100)):100;const league=LEAGUES[Math.min(LEAGUES.length-1,Math.floor(lvl/3))];return{level:lvl+1,cur,next,pct,league,toNext:next?next-xp:0}}
 function moodOf(){const goal=save.goalMin*2,done=save.todayDate===todayStr()?save.todayCount:0;if(save.streak===0&&save.daysDone>0)return{emoji:"🥺",msg:"Sentindo sua falta! Bora praticar?"};if(done>=goal)return{emoji:"😄",msg:"Meta batida! Você é incrível!"};if(done>0)return{emoji:"🙂",msg:"Bom ritmo! Continue assim."};return{emoji:"🦊",msg:"Pronto para aprender hoje?"}}
 
-function defaultSave(){return{onboarded:false,name:"",level:"basic",goalMin:10,xp:0,streak:0,lastDay:null,daysDone:0,sessions:0,todayDate:todayStr(),todayCount:0,words:{},badges:{},flags:{},freezes:2,frozeOn:null,daily:{date:todayStr(),xp:0,correct:0,sessions:0,modes:{},claimed:false},pro:false,settings:{sound:true,dark:false,reminder:false,reminderTime:"19:00"}}}
+function defaultSave(){return{onboarded:false,name:"",level:"basic",goalMin:10,xp:0,streak:0,lastDay:null,daysDone:0,sessions:0,todayDate:todayStr(),todayCount:0,words:{},badges:{},flags:{},freezes:2,frozeOn:null,daily:{date:todayStr(),xp:0,correct:0,sessions:0,modes:{},claimed:false},settings:{sound:true,dark:false,reminder:false,reminderTime:"19:00"}}}
 let save=defaultSave();
 function migrateWords(){
   Object.keys(save.words).forEach(k=>{const s=save.words[k];
@@ -1088,11 +1079,10 @@ function renderHome(){
   $("#homeChallengeMsg").textContent=save.daily.claimed?"Concluído! +"+ch.reward+" XP 🎉":prog+" / "+ch.target;
   const dl=$("#deckList");dl.innerHTML="";
   DECKS.forEach(d=>{
-    const locked=!!(d.pro&&!save.pro);
     const learned=d.words.filter(w=>learnedOf(save.words[w.en])).length;
     const el=document.createElement("div");el.className="deck";
-    el.innerHTML='<div class="emoji">'+(locked?"🔒":d.emoji)+'</div><div class="grow"><b>'+d.title+(d.pro?' <span style="font-size:11px;color:var(--brand);font-weight:800">PRO</span>':'')+'</b><span>'+(locked?"Desbloqueie com um código Pro":learned+" / "+d.words.length+" aprendidas")+'</span></div>';
-    el.onclick=()=>{if(locked){toast("Baralho Pro 🔒");openSettings();return}startDeck(d.id)};
+    el.innerHTML='<div class="emoji">'+d.emoji+'</div><div class="grow"><b>'+d.title+'</b><span>'+learned+" / "+d.words.length+" aprendidas</span></div>";
+    el.onclick=()=>startDeck(d.id);
     dl.appendChild(el);
   });
 }
@@ -1104,7 +1094,7 @@ function startSession(list,kind){
   trackMode(kind||"learn");show("scLearn");renderLearn();
 }
 function startLearn(){startSession(pick(Math.max(6,save.goalMin*2)),"learn")}
-function startDeck(id){const d=DECKS.find(x=>x.id===id);if(!d)return;if(d.pro&&!save.pro){toast("Baralho Pro 🔒");return}startSession(d.words.map(w=>Object.assign({},w)),"learn")}
+function startDeck(id){const d=DECKS.find(x=>x.id===id);if(!d)return;startSession(d.words.map(w=>Object.assign({},w)),"learn")}
 function startMistakes(){const pool=mistakePool();if(!pool.length){toast("Nenhum erro para revisar. 🎉");return}startSession(pool.slice(0,Math.max(6,save.goalMin*2)),"learn")}
 function renderLearn(){
   if(si>=session.length){finish(sessionKind);return}
@@ -1575,14 +1565,6 @@ function initSettings(){
   syncRemind();
   $("#setRemind").onclick=()=>{save.settings.reminder=!save.settings.reminder;syncRemind();if(save.settings.reminder)scheduleReminder()};
   $("#setRemindTime").oninput=()=>{save.settings.reminderTime=$("#setRemindTime").value.trim()};
-  const syncPro=()=>{$("#setProStatus").textContent=save.pro?"Pro ✅":"Grátis";$("#setProCode").value="";$("#setProCode").placeholder=save.pro?"Código Pro ativo":"Código Pro (ex.: FINN2026)"};
-  syncPro();
-  $("#setProApply").onclick=()=>{
-    const code=($("#setProCode").value||"").trim().toUpperCase();
-    if(!code){toast("Digite um código.");return}
-    if(code==="FINN2026"||code==="FINNPRO"||code==="APOIO"){save.pro=true;persist();syncPro();toast("Versão Pro ativada! 🎉")}
-    else toast("Código inválido");
-  };
   $("#setExport").onclick=exportSave;
   $("#setImport").onclick=()=>$("#setFile").click();
   $("#setFile").onchange=e=>{const f=e.target.files[0];if(f)importSave(f)};
