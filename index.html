@@ -225,6 +225,7 @@
 
     <div class="card">
       <button class="ghost block" id="goSettings">⚙️ Ajustes</button>
+      <button class="ghost block" id="goSupport">❤️ Apoie o projeto</button>
     </div>
   </section>
 
@@ -324,6 +325,9 @@
       <button class="block" id="setSave" style="margin-top:16px">Salvar</button>
     </div>
     <div class="card">
+      <button class="ghost block" id="setSupport">❤️ Apoie o projeto</button>
+    </div>
+    <div class="card">
       <div class="label">Zona de risco</div>
       <button class="block bad" id="setReset">Apagar todo o progresso</button>
     </div>
@@ -380,6 +384,41 @@
     </div>
   </section>
 
+  <section id="scSupport" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="supBack">←</button>
+      <div class="grow center"><div class="label">Apoie o projeto</div></div>
+      <span style="width:42px"></span>
+    </div>
+    <div class="card center">
+      <svg class="mascot sm" viewBox="0 0 100 100" style="margin:0 auto 4px"><use href="#finn"/></svg>
+      <h2>Ajude o Finn a crescer ❤️</h2>
+      <p id="supMsg"></p>
+    </div>
+    <div class="card" id="supPixCard">
+      <div class="label">Escolha o valor</div>
+      <div class="chips" id="supAmount" style="margin-top:8px"></div>
+      <div id="supCustomWrap" class="hidden" style="margin-top:10px">
+        <input type="text" id="supCustom" inputmode="decimal" placeholder="Digite o valor (ex.: 15)">
+      </div>
+      <div id="supPixQr" class="center" style="margin:12px 0"></div>
+      <div class="label">Chave PIX</div>
+      <div class="row" style="margin-top:6px">
+        <input type="text" id="supPixKey" class="grow" readonly>
+        <button id="supPixCopy">Copiar</button>
+      </div>
+      <button class="ghost block" id="supPixCode" style="margin-top:10px">Copiar PIX Copia e Cola</button>
+    </div>
+    <div class="card" id="supLinksCard">
+      <div class="label">Outras formas de apoiar</div>
+      <div id="supLinks" style="margin-top:8px"></div>
+    </div>
+    <div class="card center hidden" id="supEmpty">
+      <p>As formas de apoio serão adicionadas em breve. 🙏</p>
+    </div>
+    <p class="center" style="font-size:13px">Obrigado por usar o Finn English! 🙏</p>
+  </section>
+
   <nav class="foot" id="tabbar">
     <div class="inner">
       <button data-tab="home" class="on">🏠 Início</button>
@@ -415,6 +454,7 @@
   </symbol>
 </svg>
 
+<script src="qrcode.min.js"></script>
 <script>
 const DECKS=[
   {id:"basics",title:"Primeiras palavras",emoji:"🌱",level:"zero",words:[
@@ -559,7 +599,7 @@ function show(id){
   const tabmap={scHome:"home",scLearn:"learn",scSpeak:"speak",scQuiz:"quiz",scTalk:"talk",scDialog:"talk"};
   const tab=tabmap[id];
   $$("#tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
-  $("#tabbar").classList.toggle("hidden",id==="scOnboard"||id==="scSettings"||id==="scDone");
+  $("#tabbar").classList.toggle("hidden",id==="scOnboard"||id==="scSettings"||id==="scDone"||id==="scSupport");
   window.scrollTo(0,0);
 }
 
@@ -725,6 +765,97 @@ function renderQuiz(){
   });
 }
 
+const SUPPORT={
+  pixKey:"dee9d8e7-66c8-4a62-b3dc-1c563054f456",
+  pixName:"Rafael Fogaça",
+  pixCity:"Sorocaba",
+  amounts:[5,10,20],
+  defaultAmount:10,
+  kofi:"",
+  bmc:"",
+  paypal:"",
+  sponsors:"",
+  message:"Este app é gratuito e sem anúncios. Se ele te ajuda a aprender inglês, considere apoiar o projeto."
+};
+function pixCrc16(s){let c=0xffff;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021)&0xffff:(c<<1)&0xffff}return c.toString(16).toUpperCase().padStart(4,"0")}
+function pixTlv(id,v){return id+String(v.length).padStart(2,"0")+v}
+function pixNorm(s,max){return (s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9 ]/g,"").toUpperCase().slice(0,max)}
+function pixPayload(key,name,city,amount){
+  const mai=pixTlv("00","BR.GOV.BCB.PIX")+pixTlv("01",key);
+  let p=pixTlv("00","01")+pixTlv("26",mai)+pixTlv("52","0000")+pixTlv("53","986");
+  if(amount)p+=pixTlv("54",String(amount));
+  p+=pixTlv("58","BR")+pixTlv("59",pixNorm(name,25)||"RECEBEDOR")+pixTlv("60",pixNorm(city,15)||"BRASIL")+pixTlv("62",pixTlv("05","***"))+"6304";
+  return p+pixCrc16(p);
+}
+function qrSvg(text){
+  if(typeof qrcode!=="function")return "";
+  try{
+    const qr=qrcode(0,"M");qr.addData(text,"Byte");qr.make();
+    const n=qr.getModuleCount(),q=2,size=n+q*2;let d="";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(qr.isDark(r,c))d+="M"+(c+q)+" "+(r+q)+"h1v1h-1z";
+    return '<svg viewBox="0 0 '+size+' '+size+'" width="216" height="216" shape-rendering="crispEdges" style="background:#fff;border-radius:16px;box-shadow:var(--shadow-sm)"><rect width="'+size+'" height="'+size+'" fill="#fff"/><path d="'+d+'" fill="#160b2e"/></svg>';
+  }catch(e){return ""}
+}
+function copyText(t){
+  const done=()=>toast("Copiado! ✅");
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done))}
+  else fallbackCopy(t,done);
+}
+function fallbackCopy(t,cb){const a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");cb()}catch(e){toast("Não foi possível copiar")}document.body.removeChild(a)}
+function supportLinks(){
+  const L=[];
+  if(SUPPORT.kofi)L.push(["☕ Ko-fi",SUPPORT.kofi,"background:var(--grad-fox);box-shadow:0 12px 24px -12px rgba(249,115,22,.85)"]);
+  if(SUPPORT.bmc)L.push(["🍵 Buy Me a Coffee",SUPPORT.bmc,"background:var(--grad-amber);box-shadow:0 12px 24px -12px rgba(245,158,11,.85)"]);
+  if(SUPPORT.paypal)L.push(["💳 PayPal",SUPPORT.paypal,"background:var(--grad-indigo);box-shadow:0 12px 24px -12px rgba(79,70,229,.85)"]);
+  if(SUPPORT.sponsors)L.push(["⭐ GitHub Sponsors",SUPPORT.sponsors,"background:var(--grad-brand);box-shadow:0 12px 24px -12px rgba(124,58,237,.85)"]);
+  return L;
+}
+let supAmount=0,supCustom=false;
+function fmtAmount(v){return (v&&v>0)?v.toFixed(2):""}
+function updatePixQr(){
+  const raw=supCustom?parseFloat(($("#supCustom").value||"").replace(",",".")):supAmount;
+  const payload=pixPayload(SUPPORT.pixKey,SUPPORT.pixName,SUPPORT.pixCity,fmtAmount(raw));
+  $("#supPixQr").innerHTML=qrSvg(payload);
+  $("#supPixCode").onclick=()=>copyText(payload);
+}
+function renderSupport(){
+  const hasPix=!!SUPPORT.pixKey,links=supportLinks();
+  $("#supMsg").textContent=SUPPORT.message||"";
+  $("#supPixCard").classList.toggle("hidden",!hasPix);
+  $("#supLinksCard").classList.toggle("hidden",links.length===0);
+  $("#supEmpty").classList.toggle("hidden",hasPix||links.length>0);
+  if(hasPix){
+    $("#supPixKey").value=SUPPORT.pixKey;
+    $("#supPixCopy").onclick=()=>copyText(SUPPORT.pixKey);
+    supAmount=SUPPORT.defaultAmount||0;supCustom=false;
+    const abox=$("#supAmount");abox.innerHTML="";
+    (SUPPORT.amounts||[]).forEach(v=>{
+      const b=document.createElement("button");b.className="chip";b.dataset.v=v;b.textContent="R$ "+v;
+      abox.appendChild(b);
+    });
+    const other=document.createElement("button");other.className="chip";other.dataset.v="custom";other.textContent="Outro";
+    abox.appendChild(other);
+    $$("#supAmount .chip").forEach(c=>c.onclick=()=>{
+      $$("#supAmount .chip").forEach(x=>x.classList.remove("sel"));c.classList.add("sel");
+      if(c.dataset.v==="custom"){supCustom=true;$("#supCustomWrap").classList.remove("hidden");$("#supCustom").focus()}
+      else{supCustom=false;$("#supCustomWrap").classList.add("hidden");supAmount=parseFloat(c.dataset.v)}
+      updatePixQr();
+    });
+    $("#supCustom").oninput=()=>updatePixQr();
+    $("#supCustomWrap").classList.add("hidden");
+    const preset=$$("#supAmount .chip").find(c=>c.dataset.v!=="custom"&&parseFloat(c.dataset.v)===supAmount)||$$("#supAmount .chip")[0];
+    if(preset)preset.classList.add("sel");
+    updatePixQr();
+  }
+  const box=$("#supLinks");box.innerHTML="";
+  links.forEach(([label,href,style])=>{
+    const b=document.createElement("button");b.className="block";b.textContent=label;b.style.cssText=style;
+    b.onclick=()=>window.open(href,"_blank","noopener");
+    box.appendChild(b);
+  });
+}
+function openSupport(){renderSupport();show("scSupport")}
+
 let dlg={turns:[],i:0,title:"",level:"",xp:0,type:""};
 function renderTalk(){
   const box=$("#talkScenarios");box.innerHTML="";
@@ -859,6 +990,7 @@ function init(){
   $("#goQuiz").onclick=startQuiz;
   $("#goTalk").onclick=openTalk;
   $("#goSettings").onclick=()=>{initSettings();show("scSettings")};
+  $("#goSupport").onclick=openSupport;
   $("#learnBack").onclick=goHome;
   $("#learnYes").onclick=()=>answerLearn(true);
   $("#learnNo").onclick=()=>answerLearn(false);
@@ -876,6 +1008,8 @@ function init(){
   $("#dlgText").onkeydown=e=>{if(e.key==="Enter")$("#dlgSend").click()};
   $("#dlgNext").onclick=()=>{dlg.i++;renderDialog()};
   $("#setBack").onclick=goHome;
+  $("#setSupport").onclick=openSupport;
+  $("#supBack").onclick=goHome;
   $("#doneHome").onclick=goHome;
   $("#doneAgain").onclick=()=>{({learn:startLearn,speak:startSpeak,quiz:startQuiz,talk:openTalk})[lastKind]()};
   $$("#tabbar button").forEach(b=>b.onclick=()=>{
