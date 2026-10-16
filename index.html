@@ -124,6 +124,36 @@
   .foot button{flex:1;background:transparent;color:var(--muted);font-weight:700;padding:11px 6px;font-size:12px;border-radius:16px;box-shadow:none;letter-spacing:.2px}
   .foot button:hover{filter:none}
   .foot button.on{color:#fff;background:var(--grad-brand);box-shadow:0 12px 24px -12px rgba(124,58,237,.9)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+  .badge{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 10px;text-align:center;box-shadow:var(--shadow-sm)}
+  .badge.locked{opacity:.45;filter:grayscale(1)}
+  .badge .b-emoji{font-size:30px;display:block}
+  .badge b{display:block;font-size:13px;margin-top:6px}
+  .badge span{font-size:11px;color:var(--muted)}
+  .lesson-item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0;box-shadow:var(--shadow-sm);cursor:pointer;transition:.16s}
+  .lesson-item:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .lesson-item .emoji{font-size:22px;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#faf5ff,#fdf2f8)}
+  ul.lesson-points{line-height:1.7;color:var(--muted);padding-left:18px;margin:8px 0}
+  ul.lesson-points li{margin:4px 0}
+  .ex-line{display:flex;align-items:center;gap:10px;justify-content:space-between;border-bottom:1px solid var(--line);padding:10px 0}
+  .ex-line:last-child{border-bottom:none}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+  [data-theme="dark"]{
+    --ink:#ece9fb; --muted:#a5a0c0; --line:#332a52;
+    --shadow:0 18px 44px -20px rgba(0,0,0,.6);
+    --shadow-sm:0 8px 20px -12px rgba(0,0,0,.5);
+  }
+  [data-theme="dark"] body{background:
+      radial-gradient(900px 520px at 100% -8%, rgba(236,72,153,.16), transparent 60%),
+      radial-gradient(760px 520px at -12% 4%, rgba(124,58,237,.2), transparent 55%),
+      linear-gradient(180deg,#141026,#0e0b1a 70%)}
+  [data-theme="dark"] .card{background:linear-gradient(180deg,#1d1733,#191330)}
+  [data-theme="dark"] .card::before{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0))}
+  [data-theme="dark"] button.ghost,[data-theme="dark"] .chip,[data-theme="dark"] .opt,[data-theme="dark"] .stat .box,[data-theme="dark"] .deck,[data-theme="dark"] .badge,[data-theme="dark"] .lesson-item,[data-theme="dark"] .topbar .pill,[data-theme="dark"] .ring>div{background:#241d40;color:var(--ink)}
+  [data-theme="dark"] input[type=text]{background:#241d40;color:var(--ink)}
+  [data-theme="dark"] .foot .inner{background:rgba(29,23,51,.85)}
+  [data-theme="dark"] .opt.sel{background:#3a2b6e}
+  [data-theme="dark"] .progress{background:#2a2247}
   @media (max-width:400px){
     .word-en{font-size:31px}
     .mascot{width:108px;height:108px}
@@ -185,12 +215,25 @@
 
   <section id="scHome" class="screen">
     <div class="topbar">
-      <svg class="mascot sm" viewBox="0 0 100 100"><use href="#finn"/></svg>
+      <svg class="mascot sm" viewBox="0 0 100 100" aria-hidden="true"><use href="#finn"/></svg>
       <div class="grow">
         <div class="label">Bem-vindo de volta</div>
         <h2 id="homeName" style="margin:0">Olá!</h2>
       </div>
       <span class="pill" id="homeStreak">🔥 0</span>
+      <button class="ghost" id="goProfile" aria-label="Perfil" style="padding:8px 12px;border-radius:999px">👤</button>
+    </div>
+    <p id="homeMood" style="margin:0 0 8px;font-weight:600;color:var(--brand)"></p>
+
+    <div class="card">
+      <div class="row" style="gap:12px">
+        <div class="grow">
+          <div class="label">Nível <span id="homeLevel">1</span> · <span id="homeLeague">Bronze</span></div>
+          <div class="progress" style="margin:8px 0 0"><i id="homeXpBar"></i></div>
+          <p style="margin:4px 0 0;font-size:13px" id="homeXpMsg"></p>
+        </div>
+        <div class="center"><div class="big" id="homeXp" style="font-size:26px">0</div><div class="label">XP</div></div>
+      </div>
     </div>
 
     <div class="card">
@@ -204,18 +247,43 @@
       </div>
       <div class="progress"><i id="homeBar"></i></div>
       <div class="stat" style="margin-top:6px">
-        <div class="box"><b id="homeXp">0</b><span>XP</span></div>
         <div class="box"><b id="homeLearned">0</b><span>palavras</span></div>
         <div class="box"><b id="homeSessions">0</b><span>sessões</span></div>
+        <div class="box"><b id="homeBadges">0</b><span>medalhas</span></div>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Frase do dia</div>
+      <div id="homePhraseEn" class="word-en" style="font-size:24px">—</div>
+      <p id="homePhrasePt" class="ex"></p>
+      <div class="row wrap">
+        <button class="ghost" id="phraseHear">🔊 Ouvir</button>
+        <button class="ghost" id="phraseShare">📤 Compartilhar progresso</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label">Desafio de hoje</div>
+      <p id="homeChallenge" style="margin:6px 0 2px;font-weight:600;color:var(--ink)">—</p>
+      <div class="progress"><i id="homeChallengeBar"></i></div>
+      <p style="margin:4px 0 0;font-size:13px" id="homeChallengeMsg"></p>
     </div>
 
     <div class="card">
       <div class="label">Escolha um treino</div>
       <button class="block" id="goLearn">🃏 Aprender — cartões</button>
       <button class="block indigo" id="goSpeak">🎤 Falar — pronúncia</button>
+      <button class="block" id="goListen" style="background:var(--grad-indigo);box-shadow:0 12px 24px -12px rgba(79,70,229,.85)">🎧 Escutar — ouvir e escrever</button>
       <button class="block amber" id="goQuiz">🎯 Quiz — tradução</button>
+      <button class="block" id="goType" style="background:var(--grad-ok);box-shadow:0 12px 24px -12px rgba(34,197,94,.85)">⌨️ Digitar — escrever</button>
       <button class="block" id="goTalk" style="background:var(--grad-fox);box-shadow:0 12px 24px -12px rgba(249,115,22,.85)">🗣️ Conversar — entrevista e diálogos</button>
+    </div>
+
+    <div class="card">
+      <div class="label">Estudar mais</div>
+      <button class="ghost block" id="goGrammar">📘 Gramática</button>
+      <button class="ghost block" id="goMistakes">📓 Caderno de erros</button>
     </div>
 
     <div class="card">
@@ -224,6 +292,7 @@
     </div>
 
     <div class="card">
+      <button class="ghost block" id="goBadges">🏅 Conquistas</button>
       <button class="ghost block" id="goSettings">⚙️ Ajustes</button>
       <button class="ghost block" id="goSupport">❤️ Apoie o projeto</button>
     </div>
@@ -322,7 +391,34 @@
         <div class="grow"><b>Som</b><br><span style="color:var(--muted);font-size:13px">Efeitos e voz</span></div>
         <button class="chip" id="setSound">Ligado</button>
       </div>
+      <div class="row" style="margin-top:14px">
+        <div class="grow"><b>Modo escuro</b><br><span style="color:var(--muted);font-size:13px">Fundo escuro confortável</span></div>
+        <button class="chip" id="setDark">Desligado</button>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <div class="grow"><b>Lembrete diário</b><br><span style="color:var(--muted);font-size:13px">Aviso para praticar</span></div>
+        <button class="chip" id="setRemind">Desligado</button>
+      </div>
+      <div class="row" id="setRemindRow" style="margin-top:10px;display:none">
+        <div class="grow"><b>Horário</b></div>
+        <input type="text" id="setRemindTime" style="width:110px;text-align:center" placeholder="19:00">
+      </div>
       <button class="block" id="setSave" style="margin-top:16px">Salvar</button>
+    </div>
+    <div class="card">
+      <div class="label">Versão Pro</div>
+      <p style="margin:4px 0 10px;color:var(--muted);font-size:13px">Desbloqueie os baralhos Pro (phrasal verbs e gírias) e apoie o projeto.</p>
+      <input type="text" id="setProCode" placeholder="Código Pro (ex.: FINN2026)">
+      <div class="row" style="margin-top:10px">
+        <button class="ghost grow" id="setProApply">Ativar código</button>
+        <span class="pill" id="setProStatus">Grátis</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="label">Backup</div>
+      <button class="ghost block" id="setExport">⬇️ Exportar progresso</button>
+      <button class="ghost block" id="setImport">⬆️ Importar progresso</button>
+      <input type="file" id="setFile" accept="application/json,.json" class="hidden">
     </div>
     <div class="card">
       <button class="ghost block" id="setSupport">❤️ Apoie o projeto</button>
@@ -419,6 +515,120 @@
     <p class="center" style="font-size:13px">Obrigado por usar o Finn English! 🙏</p>
   </section>
 
+  <section id="scType" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="typeBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label" id="typeCount">0 / 0</div></div>
+      <span class="pill" id="typeScore">0 acertos</span>
+    </div>
+    <div class="progress"><i id="typeBar"></i></div>
+    <div class="card center">
+      <div class="label">Escreva em inglês</div>
+      <div class="word-en" id="typePt" style="font-size:30px">—</div>
+      <p class="ex" id="typeEx"></p>
+    </div>
+    <div class="row">
+      <input type="text" id="typeInput" class="grow" placeholder="Digite em inglês..." autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="typeSend">Verificar</button>
+    </div>
+    <div class="card hidden" id="typeFeedback">
+      <div id="typeResult" style="font-weight:700"></div>
+      <div id="typeAnswer" class="word-en" style="font-size:22px;margin:6px 0"></div>
+      <button class="block" id="typeNext">Próxima →</button>
+    </div>
+  </section>
+
+  <section id="scListen" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="listenBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label" id="listenCount">0 / 0</div></div>
+      <span class="pill" id="listenScore">0 acertos</span>
+    </div>
+    <div class="progress"><i id="listenBar"></i></div>
+    <div class="card center">
+      <div class="label">Ouça e escreva</div>
+      <button class="mic" id="listenPlay" aria-label="Ouvir" style="margin:10px auto">🔊</button>
+      <p class="ex" id="listenHint">Toque para ouvir. Repita quantas vezes quiser.</p>
+    </div>
+    <div class="row">
+      <input type="text" id="listenInput" class="grow" placeholder="Digite o que ouviu (em inglês)..." autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button id="listenSend">Verificar</button>
+    </div>
+    <div class="card hidden" id="listenFeedback">
+      <div id="listenResult" style="font-weight:700"></div>
+      <div id="listenAnswer" class="word-en" style="font-size:22px;margin:6px 0"></div>
+      <button class="block" id="listenNext">Próxima →</button>
+    </div>
+  </section>
+
+  <section id="scGrammar" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="gramBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label">Gramática</div></div>
+      <span style="width:44px"></span>
+    </div>
+    <div class="card">
+      <div class="label">Lições essenciais</div>
+      <div id="grammarList"></div>
+    </div>
+  </section>
+
+  <section id="scLesson" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="lessonBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label" id="lessonTitle">—</div></div>
+      <span style="width:44px"></span>
+    </div>
+    <div class="card">
+      <p id="lessonIntro" style="margin:0;color:var(--ink);font-weight:600"></p>
+      <ul class="lesson-points" id="lessonPoints"></ul>
+    </div>
+    <div class="card">
+      <div class="label">Exemplos</div>
+      <div id="lessonExamples"></div>
+    </div>
+  </section>
+
+  <section id="scBadges" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="badgesBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label">Conquistas</div></div>
+      <span class="pill" id="badgesCount">0 / 0</span>
+    </div>
+    <div class="card"><div class="grid" id="badgesGrid"></div></div>
+  </section>
+
+  <section id="scProfile" class="screen">
+    <div class="topbar">
+      <button class="ghost" id="profBack" aria-label="Voltar">←</button>
+      <div class="grow center"><div class="label">Perfil</div></div>
+      <span style="width:44px"></span>
+    </div>
+    <div class="card center">
+      <svg class="mascot" viewBox="0 0 100 100" aria-hidden="true"><use href="#finn"/></svg>
+      <h2 id="profName" style="margin:6px 0 2px">Olá!</h2>
+      <div class="label" id="profLeague">Bronze · Nível 1</div>
+    </div>
+    <div class="card">
+      <div class="stat">
+        <div class="box"><b id="profXp">0</b><span>XP</span></div>
+        <div class="box"><b id="profStreak">0</b><span>streak</span></div>
+        <div class="box"><b id="profWords">0</b><span>palavras</span></div>
+      </div>
+      <div class="stat" style="margin-top:10px">
+        <div class="box"><b id="profSessions">0</b><span>sessões</span></div>
+        <div class="box"><b id="profBadges">0</b><span>medalhas</span></div>
+        <div class="box"><b id="profFreezes">0</b><span>🧊 gelos</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <button class="block" id="profShare">📤 Compartilhar progresso</button>
+      <button class="ghost block" id="profExport">⬇️ Exportar progresso</button>
+      <button class="ghost block" id="profImport">⬆️ Importar progresso</button>
+      <input type="file" id="profFile" accept="application/json,.json" class="hidden">
+    </div>
+  </section>
+
   <nav class="foot" id="tabbar">
     <div class="inner">
       <button data-tab="home" class="on">🏠 Início</button>
@@ -504,6 +714,90 @@ const DECKS=[
     {en:"goal",pt:"meta",ex:"My goal is ten minutes a day."},
     {en:"question",pt:"pergunta",ex:"I have a question."},
     {en:"answer",pt:"resposta",ex:"Your answer is correct."}
+  ]},
+  {id:"numbers",title:"Números e tempo",emoji:"🔢",level:"zero",words:[
+    {en:"one",pt:"um",ex:"I have one brother."},
+    {en:"two",pt:"dois",ex:"Two coffees, please."},
+    {en:"three",pt:"três",ex:"She has three cats."},
+    {en:"ten",pt:"dez",ex:"I need ten minutes."},
+    {en:"hundred",pt:"cem",ex:"There are a hundred people."},
+    {en:"hour",pt:"hora",ex:"The class lasts one hour."},
+    {en:"minute",pt:"minuto",ex:"Wait a minute, please."},
+    {en:"week",pt:"semana",ex:"See you next week."},
+    {en:"month",pt:"mês",ex:"I study every month."},
+    {en:"year",pt:"ano",ex:"Happy new year!"}
+  ]},
+  {id:"colors",title:"Cores e formas",emoji:"🎨",level:"zero",words:[
+    {en:"red",pt:"vermelho",ex:"The apple is red."},
+    {en:"blue",pt:"azul",ex:"I like the blue sky."},
+    {en:"green",pt:"verde",ex:"The grass is green."},
+    {en:"yellow",pt:"amarelo",ex:"The sun is yellow."},
+    {en:"black",pt:"preto",ex:"I have a black bag."},
+    {en:"white",pt:"branco",ex:"She wears a white shirt."},
+    {en:"big",pt:"grande",ex:"That is a big house."},
+    {en:"small",pt:"pequeno",ex:"It is a small dog."},
+    {en:"round",pt:"redondo",ex:"The table is round."},
+    {en:"square",pt:"quadrado",ex:"Draw a square, please."}
+  ]},
+  {id:"family",title:"Família e pessoas",emoji:"👨‍👩‍👧",level:"basic",words:[
+    {en:"mother",pt:"mãe",ex:"My mother is a teacher."},
+    {en:"father",pt:"pai",ex:"His father works here."},
+    {en:"brother",pt:"irmão",ex:"I have one brother."},
+    {en:"sister",pt:"irmã",ex:"My sister lives in Rio."},
+    {en:"son",pt:"filho",ex:"Their son is tall."},
+    {en:"daughter",pt:"filha",ex:"Her daughter is smart."},
+    {en:"wife",pt:"esposa",ex:"He loves his wife."},
+    {en:"husband",pt:"marido",ex:"She met her husband here."},
+    {en:"child",pt:"criança",ex:"The child is playing."},
+    {en:"people",pt:"pessoas",ex:"Many people came."}
+  ]},
+  {id:"food",title:"Comida e bebida",emoji:"🍎",level:"basic",words:[
+    {en:"rice",pt:"arroz",ex:"We eat rice every day."},
+    {en:"beans",pt:"feijão",ex:"The beans are ready."},
+    {en:"bread",pt:"pão",ex:"I buy fresh bread."},
+    {en:"cheese",pt:"queijo",ex:"This cheese is good."},
+    {en:"egg",pt:"ovo",ex:"I want one egg."},
+    {en:"chicken",pt:"frango",ex:"The chicken is tasty."},
+    {en:"juice",pt:"suco",ex:"A glass of juice, please."},
+    {en:"coffee",pt:"café",ex:"I drink coffee in the morning."},
+    {en:"tea",pt:"chá",ex:"She likes green tea."},
+    {en:"dessert",pt:"sobremesa",ex:"Do you want dessert?"}
+  ]},
+  {id:"verbs",title:"Verbos irregulares",emoji:"⚡",level:"conv",words:[
+    {en:"go / went",pt:"ir / foi",ex:"I went to the beach."},
+    {en:"see / saw",pt:"ver / viu",ex:"I saw a good movie."},
+    {en:"eat / ate",pt:"comer / comeu",ex:"We ate pizza last night."},
+    {en:"make / made",pt:"fazer / fez",ex:"She made a cake."},
+    {en:"take / took",pt:"pegar / pegou",ex:"He took the bus."},
+    {en:"come / came",pt:"vir / veio",ex:"They came early."},
+    {en:"give / gave",pt:"dar / deu",ex:"I gave him a gift."},
+    {en:"think / thought",pt:"pensar / pensou",ex:"I thought about you."},
+    {en:"buy / bought",pt:"comprar / comprou",ex:"She bought a new phone."},
+    {en:"write / wrote",pt:"escrever / escreveu",ex:"He wrote a letter."}
+  ]},
+  {id:"phrasal",title:"Phrasal verbs",emoji:"🧩",level:"adv",pro:true,words:[
+    {en:"wake up",pt:"acordar",ex:"I wake up at six."},
+    {en:"get up",pt:"levantar",ex:"Get up, it is late!"},
+    {en:"look for",pt:"procurar",ex:"I am looking for my keys."},
+    {en:"find out",pt:"descobrir",ex:"I found out the truth."},
+    {en:"turn on",pt:"ligar",ex:"Turn on the light."},
+    {en:"turn off",pt:"desligar",ex:"Turn off the TV."},
+    {en:"give up",pt:"desistir",ex:"Never give up!"},
+    {en:"pick up",pt:"pegar / buscar",ex:"I will pick you up at eight."},
+    {en:"run out of",pt:"ficar sem",ex:"We ran out of milk."},
+    {en:"come back",pt:"voltar",ex:"Please come back soon."}
+  ]},
+  {id:"slang",title:"Gírias e expressões",emoji:"😎",level:"adv",pro:true,words:[
+    {en:"what's up?",pt:"e aí?",ex:"Hey, what's up?"},
+    {en:"cool",pt:"legal",ex:"That is really cool!"},
+    {en:"hang out",pt:"sair / curtir",ex:"Let's hang out this weekend."},
+    {en:"no big deal",pt:"nada demais",ex:"It's no big deal."},
+    {en:"my bad",pt:"foi mal",ex:"My bad, I forgot."},
+    {en:"piece of cake",pt:"moleza",ex:"The test was a piece of cake."},
+    {en:"hit the road",pt:"cair na estrada",ex:"Let's hit the road."},
+    {en:"chill",pt:"relaxar",ex:"Just chill, everything is fine."},
+    {en:"awesome",pt:"incrível",ex:"You did an awesome job!"},
+    {en:"hang in there",pt:"aguenta firme",ex:"Hang in there, it gets better."}
   ]}
 ];
 const SENTENCES=[
@@ -574,7 +868,99 @@ const SCENARIOS=[
     {en:"Alright, I think we have a deal.",pt:"Certo, acho que temos um acordo.",tip:"Feche com positividade.",sample:"Excellent. I am glad we could work together. I will send the contract today."}
   ]}
 ];
-const INTERVALS=[0,1,2,4,7,15,30];
+const PHRASES=[
+  {en:"Practice makes perfect.",pt:"A prática leva à perfeição."},
+  {en:"How are you doing today?",pt:"Como você está hoje?"},
+  {en:"I am on my way.",pt:"Estou a caminho."},
+  {en:"Could you say that again, please?",pt:"Você pode repetir, por favor?"},
+  {en:"I don't understand. Can you explain?",pt:"Eu não entendo. Pode explicar?"},
+  {en:"What does this word mean?",pt:"O que significa esta palavra?"},
+  {en:"It was nice talking to you.",pt:"Foi bom falar com você."},
+  {en:"I am looking forward to it.",pt:"Estou ansioso por isso."},
+  {en:"Let me know if you need help.",pt:"Me avise se precisar de ajuda."},
+  {en:"That sounds like a great idea.",pt:"Isso parece uma ótima ideia."},
+  {en:"I completely agree with you.",pt:"Concordo totalmente com você."},
+  {en:"Sorry, I didn't catch that.",pt:"Desculpe, não entendi."},
+  {en:"Can I ask you a question?",pt:"Posso te fazer uma pergunta?"},
+  {en:"Everything is going well.",pt:"Está tudo indo bem."},
+  {en:"Take your time, there is no rush.",pt:"Sem pressa, não há pressa."},
+  {en:"Have a wonderful day!",pt:"Tenha um ótimo dia!"}
+];
+const GRAMMAR=[
+  {id:"present",title:"Presente simples",emoji:"⏱️",intro:"Use para rotinas, hábitos e fatos.",points:[
+    "I / You / We / They + verbo: I work, you study.",
+    "He / She / It + verbo + s: he works, she studies.",
+    "Negativa: I do not (don't) work. He does not (doesn't) work.",
+    "Pergunta: Do you work? Does she work?"
+  ],examples:[
+    {en:"I work every day.",pt:"Eu trabalho todos os dias."},
+    {en:"She studies English.",pt:"Ela estuda inglês."},
+    {en:"They don't live here.",pt:"Eles não moram aqui."}
+  ]},
+  {id:"continuous",title:"Presente contínuo",emoji:"🏃",intro:"Use para ações que acontecem agora ou nesta fase.",points:[
+    "Forma: am / is / are + verbo-ing: I am working.",
+    "Negativa: I am not working. She is not (isn't) working.",
+    "Pergunta: Are you working? Is he working?"
+  ],examples:[
+    {en:"I am learning English.",pt:"Estou aprendendo inglês."},
+    {en:"She is talking on the phone.",pt:"Ela está falando ao telefone."},
+    {en:"We are not sleeping.",pt:"Nós não estamos dormindo."}
+  ]},
+  {id:"past",title:"Passado simples",emoji:"⏪",intro:"Use para ações terminadas no passado.",points:[
+    "Verbos regulares: verbo + ed (worked, played).",
+    "Verbos irregulares têm forma própria (went, saw, ate).",
+    "Negativa: I did not (didn't) work. Pergunta: Did you work?"
+  ],examples:[
+    {en:"I visited my family yesterday.",pt:"Visitei minha família ontem."},
+    {en:"He went to the beach.",pt:"Ele foi à praia."},
+    {en:"They didn't come.",pt:"Eles não vieram."}
+  ]},
+  {id:"future",title:"Futuro (will / going to)",emoji:"⏩",intro:"Duas formas comuns de falar do futuro.",points:[
+    "will + verbo: decisões e previsões (I will help you).",
+    "going to + verbo: planos (I am going to travel).",
+    "Negativa: won't / am not going to."
+  ],examples:[
+    {en:"I will call you later.",pt:"Eu te ligo mais tarde."},
+    {en:"We are going to move.",pt:"Nós vamos nos mudar."},
+    {en:"It won't rain tomorrow.",pt:"Não vai chover amanhã."}
+  ]},
+  {id:"questions",title:"Perguntas (Wh-)",emoji:"❓",intro:"Palavras para fazer perguntas.",points:[
+    "What (o quê), Where (onde), When (quando), Who (quem), Why (por quê), How (como).",
+    "Ordem: Wh- + auxiliar + sujeito + verbo: Where do you live?"
+  ],examples:[
+    {en:"Where do you live?",pt:"Onde você mora?"},
+    {en:"What time is it?",pt:"Que horas são?"},
+    {en:"Why are you studying?",pt:"Por que você está estudando?"}
+  ]},
+  {id:"compare",title:"Comparativos e superlativos",emoji:"📊",intro:"Compare coisas e pessoas.",points:[
+    "Curtos: big → bigger → the biggest.",
+    "Longos: expensive → more expensive → the most expensive.",
+    "good → better → the best; bad → worse → the worst."
+  ],examples:[
+    {en:"This book is better than that one.",pt:"Este livro é melhor que aquele."},
+    {en:"She is the tallest in the class.",pt:"Ela é a mais alta da turma."},
+    {en:"It is more expensive here.",pt:"É mais caro aqui."}
+  ]}
+];
+const BADGES=[
+  {id:"first",emoji:"🌟",title:"Primeiro passo",desc:"Complete 1 sessão",test:s=>s.sessions>=1},
+  {id:"streak3",emoji:"🔥",title:"Aquecendo",desc:"3 dias seguidos",test:s=>s.streak>=3},
+  {id:"streak7",emoji:"🔥",title:"Uma semana!",desc:"7 dias seguidos",test:s=>s.streak>=7},
+  {id:"streak30",emoji:"🏆",title:"Mês inteiro",desc:"30 dias seguidos",test:s=>s.streak>=30},
+  {id:"words10",emoji:"📚",title:"Leitor iniciante",desc:"Aprenda 10 palavras",test:s=>learnedCount()>=10},
+  {id:"words50",emoji:"📚",title:"Bom vocabulário",desc:"Aprenda 50 palavras",test:s=>learnedCount()>=50},
+  {id:"words100",emoji:"🧠",title:"Mestre das palavras",desc:"Aprenda 100 palavras",test:s=>learnedCount()>=100},
+  {id:"xp500",emoji:"⚡",title:"Energia",desc:"Acumule 500 XP",test:s=>s.xp>=500},
+  {id:"xp2000",emoji:"⚡",title:"Turbo",desc:"Acumule 2.000 XP",test:s=>s.xp>=2000},
+  {id:"sessions10",emoji:"💪",title:"Constância",desc:"10 sessões",test:s=>s.sessions>=10},
+  {id:"sessions50",emoji:"🏅",title:"Veterano",desc:"50 sessões",test:s=>s.sessions>=50},
+  {id:"interview",emoji:"💼",title:"Entrevistado",desc:"Complete uma entrevista",test:s=>!!(s.flags&&s.flags.interview)},
+  {id:"dialog",emoji:"🗣️",title:"Conversador",desc:"Complete um diálogo",test:s=>!!(s.flags&&s.flags.dialog)},
+  {id:"leech",emoji:"🐝",title:"Superação",desc:"Domine uma palavra difícil",test:s=>Object.values(s.words).some(w=>w.leech&&w.reps>=3)}
+];
+const LEVELS=[0,60,160,320,520,800,1150,1600,2200,3000,4000,5200,6600,8200,10000,12000,15000,20000];
+const LEAGUES=["Bronze","Prata","Ouro","Platina","Diamante","Mestre","Lenda"];
+const OLD_INTERVALS=[0,1,2,4,7,15,30];
 const KEY="pipEnglishSave";
 const $=s=>document.querySelector(s);
 const $$=s=>Array.from(document.querySelectorAll(s));
@@ -583,10 +969,45 @@ function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMo
 function addDays(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function allWords(){const out=[];DECKS.forEach(d=>d.words.forEach(w=>out.push({...w,deck:d.id,deckTitle:d.title})));return out}
 
-function defaultSave(){return{onboarded:false,name:"",level:"basic",goalMin:10,xp:0,streak:0,lastDay:null,daysDone:0,sessions:0,learned:0,todayDate:todayStr(),todayCount:0,words:{},settings:{sound:true}}}
+function daysBetween(a,b){const da=new Date(a+"T00:00:00"),db=new Date(b+"T00:00:00");return Math.round((db-da)/86400000)}
+function dayNumber(){return Math.floor(new Date(todayStr()+"T00:00:00").getTime()/86400000)}
+function levelInfo(xp){let lvl=0;for(let i=0;i<LEVELS.length;i++){if(xp>=LEVELS[i])lvl=i;else break}const cur=LEVELS[lvl],next=LEVELS[lvl+1]!=null?LEVELS[lvl+1]:null;const pct=next?Math.min(100,Math.round((xp-cur)/(next-cur)*100)):100;const league=LEAGUES[Math.min(LEAGUES.length-1,Math.floor(lvl/3))];return{level:lvl+1,cur,next,pct,league,toNext:next?next-xp:0}}
+function moodOf(){const goal=save.goalMin*2,done=save.todayDate===todayStr()?save.todayCount:0;if(save.streak===0&&save.daysDone>0)return{emoji:"🥺",msg:"Sentindo sua falta! Bora praticar?"};if(done>=goal)return{emoji:"😄",msg:"Meta batida! Você é incrível!"};if(done>0)return{emoji:"🙂",msg:"Bom ritmo! Continue assim."};return{emoji:"🦊",msg:"Pronto para aprender hoje?"}}
+
+function defaultSave(){return{onboarded:false,name:"",level:"basic",goalMin:10,xp:0,streak:0,lastDay:null,daysDone:0,sessions:0,todayDate:todayStr(),todayCount:0,words:{},badges:{},flags:{},freezes:2,frozeOn:null,daily:{date:todayStr(),xp:0,correct:0,sessions:0,modes:{},claimed:false},pro:false,settings:{sound:true,dark:false,reminder:false,reminderTime:"19:00"}}}
 let save=defaultSave();
-function load(){try{const raw=localStorage.getItem(KEY);if(raw){const p=JSON.parse(raw);save=Object.assign(defaultSave(),p);save.settings=Object.assign({sound:true},p.settings||{})}}catch(e){save=defaultSave()}}
+function migrateWords(){
+  Object.keys(save.words).forEach(k=>{const s=save.words[k];
+    if(s.reps==null){const box=s.box||0;s.reps=box;s.interval=(OLD_INTERVALS[box]||0);s.ef=2.5}
+    if(s.ef==null)s.ef=2.5;if(s.interval==null)s.interval=0;if(s.reps==null)s.reps=0;if(s.leech==null)s.leech=false;
+  });
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){const p=JSON.parse(raw);save=Object.assign(defaultSave(),p);
+      save.settings=Object.assign({sound:true,dark:false,reminder:false,reminderTime:"19:00"},p.settings||{});
+      save.daily=Object.assign({date:todayStr(),xp:0,correct:0,sessions:0,modes:{},claimed:false},p.daily||{});
+      save.badges=p.badges||{};save.flags=p.flags||{};
+      if(save.freezes==null)save.freezes=2;
+      migrateWords();
+    }
+  }catch(e){save=defaultSave()}
+  applyStreakFreeze();
+}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}}
+function applyStreakFreeze(){
+  if(!save.lastDay)return;
+  const t=todayStr();
+  if(save.lastDay>=t)return;
+  if(save.lastDay>=addDays(-1))return;
+  const missed=daysBetween(save.lastDay,t)-1;
+  if(missed>0&&save.streak>0){
+    if(save.freezes>=missed){save.freezes-=missed;save.frozeOn=t;toast("🧊 Streak protegido com gelo!")}
+    else{save.freezes=0;save.streak=0;}
+    persist();
+  }
+}
 
 let audioCtx=null;
 function beep(freq,dur){if(!save.settings.sound)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;o.type="sine";g.gain.value=.06;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+(dur||.12))}catch(e){}}
@@ -599,23 +1020,32 @@ function show(id){
   const tabmap={scHome:"home",scLearn:"learn",scSpeak:"speak",scQuiz:"quiz",scTalk:"talk",scDialog:"talk"};
   const tab=tabmap[id];
   $$("#tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===tab));
-  $("#tabbar").classList.toggle("hidden",id==="scOnboard"||id==="scSettings"||id==="scDone"||id==="scSupport");
+  $("#tabbar").classList.toggle("hidden",["scOnboard","scSettings","scDone","scSupport","scType","scListen","scGrammar","scLesson","scBadges","scProfile"].indexOf(id)>=0);
   window.scrollTo(0,0);
 }
 
-function wordState(en){if(!save.words[en])save.words[en]={box:0,due:todayStr(),ok:0,no:0};return save.words[en]}
-function duePool(){const t=todayStr();const pool=allWords().filter(w=>{const s=save.words[w.en];return !s||s.due<=t});return pool}
+function wordState(en){if(!save.words[en])save.words[en]={ef:2.5,interval:0,reps:0,due:todayStr(),ok:0,no:0,leech:false};return save.words[en]}
+function boxOf(s){if(!s||s.reps<1)return 0;if(s.interval<=1)return 1;if(s.interval<=6)return 2;if(s.interval<=15)return 3;if(s.interval<=30)return 4;if(s.interval<=90)return 5;return 6}
+function learnedOf(s){return !!s&&s.reps>=3}
+function duePool(){const t=todayStr();return allWords().filter(w=>{const s=save.words[w.en];return !s||s.due<=t})}
 function pick(n){const due=duePool();const shuffled=due.slice().sort(()=>Math.random()-.5);if(shuffled.length>=n)return shuffled.slice(0,n);const rest=allWords().filter(w=>!shuffled.some(x=>x.en===w.en)).sort(()=>Math.random()-.5);return shuffled.concat(rest).slice(0,n)}
-function learnedCount(){return Object.values(save.words).filter(s=>s.box>=3).length}
+function learnedCount(){return Object.values(save.words).filter(learnedOf).length}
+function mistakePool(){return allWords().filter(w=>{const s=save.words[w.en];return s&&s.no>0&&!learnedOf(s)}).sort((a,b)=>save.words[b.en].no-save.words[a.en].no)}
+function leechPool(){return allWords().filter(w=>{const s=save.words[w.en];return s&&s.leech})}
 
 function registerAnswer(en,correct){
   const s=wordState(en);
-  if(correct){s.box=Math.min(s.box+1,INTERVALS.length-1);s.ok++}else{s.box=0;s.no++}
-  s.due=addDays(INTERVALS[s.box]);
+  const q=correct?4:1;
+  if(q<3){s.reps=0;s.interval=0;s.no++}
+  else{s.reps++;s.ok++;if(s.reps===1)s.interval=1;else if(s.reps===2)s.interval=6;else s.interval=Math.round((s.interval||1)*s.ef)}
+  s.ef=Math.max(1.3,s.ef+(0.1-(5-q)*(0.08+(5-q)*0.02)));
+  s.leech=s.no>=4&&s.reps<3;
+  s.due=addDays(q<3?0:s.interval);
   save.xp+=correct?10:4;
   if(save.todayDate!==todayStr()){save.todayDate=todayStr();save.todayCount=0}
   save.todayCount++;
-  persist();
+  trackDaily("xp",correct?10:4);trackDaily("correct",correct?1:0);
+  persist();checkBadges();
 }
 function completeSession(){
   const t=todayStr();
@@ -623,44 +1053,66 @@ function completeSession(){
     if(save.lastDay===addDays(-1))save.streak++;else save.streak=1;
     save.lastDay=t;save.daysDone++;
   }
-  save.sessions++;persist();
+  save.sessions++;trackDaily("sessions",1);persist();checkBadges();
 }
+function trackDaily(k,n){const t=todayStr();if(save.daily.date!==t)save.daily={date:t,xp:0,correct:0,sessions:0,modes:{},claimed:false};save.daily[k]=(save.daily[k]||0)+n;maybeClaimDaily()}
+function trackMode(kind){const t=todayStr();if(save.daily.date!==t)save.daily={date:t,xp:0,correct:0,sessions:0,modes:{},claimed:false};save.daily.modes[kind]=true;maybeClaimDaily()}
+function dailyChallenge(){const list=[{type:"xp",target:60,reward:30,label:"Ganhe 60 XP hoje"},{type:"correct",target:15,reward:30,label:"Acerte 15 respostas hoje"},{type:"modes",target:3,reward:40,label:"Pratique 3 modos diferentes hoje"},{type:"sessions",target:2,reward:40,label:"Complete 2 sessões hoje"}];return list[dayNumber()%list.length]}
+function dailyProgress(ch){const d=save.daily;if(ch.type==="modes")return Object.keys(d.modes||{}).length;return d[ch.type]||0}
+function dailyPhrase(){return PHRASES[dayNumber()%PHRASES.length]}
+function maybeClaimDaily(){const ch=dailyChallenge();if(save.daily.claimed)return;if(dailyProgress(ch)>=ch.target){save.daily.claimed=true;save.xp+=ch.reward;persist();toast("🏆 Desafio do dia! +"+ch.reward+" XP")}}
+function checkBadges(){BADGES.forEach(b=>{if(!save.badges[b.id]&&b.test(save)){save.badges[b.id]=true;persist();toast("🏅 "+b.title+" "+b.emoji)}})}
+
 function renderHome(){
   $("#homeName").textContent=save.name?("Olá, "+save.name+"!"):"Olá!";
   $("#homeStreak").textContent="🔥 "+save.streak;
-  const goal=save.goalMin*2;
-  const done=save.todayDate===todayStr()?save.todayCount:0;
+  const m=moodOf();$("#homeMood").textContent=m.emoji+" "+m.msg;
+  const li=levelInfo(save.xp);
+  $("#homeLevel").textContent=li.level;$("#homeLeague").textContent=li.league;
+  $("#homeXp").textContent=save.xp;$("#homeXpBar").style.width=li.pct+"%";
+  $("#homeXpMsg").textContent=li.next?("Faltam "+li.toNext+" XP para o nível "+(li.level+1)):"Nível máximo alcançado!";
+  const goal=save.goalMin*2,done=save.todayDate===todayStr()?save.todayCount:0;
   const pct=Math.min(100,Math.round(done/goal*100));
   $("#homeRing").style.setProperty("--p",pct);
   $("#homeRingTxt").textContent=pct+"%";
   $("#homeGoalTxt").textContent=done+" / "+goal;
   $("#homeBar").style.width=pct+"%";
-  $("#homeXp").textContent=save.xp;
   $("#homeLearned").textContent=learnedCount();
   $("#homeSessions").textContent=save.sessions;
+  $("#homeBadges").textContent=Object.keys(save.badges).length+"/"+BADGES.length;
   $("#homeGoalMsg").textContent=pct>=100?"Meta batida! 🎉":"Faltam "+(goal-done)+" para a meta de hoje.";
+  const ph=dailyPhrase();$("#homePhraseEn").textContent=ph.en;$("#homePhrasePt").textContent=ph.pt;
+  const ch=dailyChallenge(),prog=Math.min(dailyProgress(ch),ch.target);
+  $("#homeChallenge").textContent=ch.label;
+  $("#homeChallengeBar").style.width=Math.round(prog/ch.target*100)+"%";
+  $("#homeChallengeMsg").textContent=save.daily.claimed?"Concluído! +"+ch.reward+" XP 🎉":prog+" / "+ch.target;
   const dl=$("#deckList");dl.innerHTML="";
   DECKS.forEach(d=>{
-    const learned=d.words.filter(w=>save.words[w.en]&&save.words[w.en].box>=3).length;
+    const locked=!!(d.pro&&!save.pro);
+    const learned=d.words.filter(w=>learnedOf(save.words[w.en])).length;
     const el=document.createElement("div");el.className="deck";
-    el.innerHTML='<div class="emoji">'+d.emoji+'</div><div class="grow"><b>'+d.title+'</b><span>'+learned+" / "+d.words.length+" aprendidas</span></div>";
+    el.innerHTML='<div class="emoji">'+(locked?"🔒":d.emoji)+'</div><div class="grow"><b>'+d.title+(d.pro?' <span style="font-size:11px;color:var(--brand);font-weight:800">PRO</span>':'')+'</b><span>'+(locked?"Desbloqueie com um código Pro":learned+" / "+d.words.length+" aprendidas")+'</span></div>';
+    el.onclick=()=>{if(locked){toast("Baralho Pro 🔒");openSettings();return}startDeck(d.id)};
     dl.appendChild(el);
   });
 }
 
-let session=[],si=0,sessionXp=0;
-function startLearn(){
-  const n=Math.max(6,save.goalMin*2);
-  session=pick(n);si=0;sessionXp=0;
+let session=[],si=0,sessionXp=0,sessionKind="learn";
+function startSession(list,kind){
+  session=list.slice();si=0;sessionXp=0;sessionKind=kind||"learn";
   if(!session.length){toast("Tudo revisado por hoje!");show("scHome");return}
-  show("scLearn");renderLearn();
+  trackMode(kind||"learn");show("scLearn");renderLearn();
 }
+function startLearn(){startSession(pick(Math.max(6,save.goalMin*2)),"learn")}
+function startDeck(id){const d=DECKS.find(x=>x.id===id);if(!d)return;if(d.pro&&!save.pro){toast("Baralho Pro 🔒");return}startSession(d.words.map(w=>Object.assign({},w)),"learn")}
+function startMistakes(){const pool=mistakePool();if(!pool.length){toast("Nenhum erro para revisar. 🎉");return}startSession(pool.slice(0,Math.max(6,save.goalMin*2)),"learn")}
 function renderLearn(){
-  if(si>=session.length){finish("learn");return}
+  if(si>=session.length){finish(sessionKind);return}
   const w=session[si],s=wordState(w.en);
   $("#learnCount").textContent=(si+1)+" / "+session.length;
   $("#learnBar").style.width=(si/session.length*100)+"%";
-  $("#learnBox").textContent=s.box===0?"Nova":("Nível "+s.box);
+  const bx=boxOf(s);
+  $("#learnBox").textContent=s.leech?"Difícil 🐝":(bx===0?"Nova":("Nível "+bx));
   $("#learnEn").textContent=w.en;
   $("#learnEx").textContent=w.ex;
   $("#learnReveal").innerHTML='<button class="block" id="learnShow">Mostrar tradução</button>';
@@ -932,13 +1384,155 @@ let lastKind="learn";
 function finish(kind){
   lastKind=kind;
   completeSession();
-  const gained=kind==="learn"?sessionXp:kind==="speak"?speakXp:qScore*10;
-  $("#doneTitle").textContent=kind==="quiz"&&qScore===quizList.length?"Perfeito! 🌟":"Muito bem!";
+  const gained=kind==="learn"?sessionXp:kind==="speak"?speakXp:kind==="listen"?listenScore*10:kind==="type"?typeScore*10:qScore*10;
+  $("#doneTitle").textContent=(kind==="quiz"&&qScore===quizList.length)?"Perfeito! 🌟":"Muito bem!";
   $("#doneXp").textContent=gained;
   $("#doneStreak").textContent=save.streak;
   $("#doneTotal").textContent=learnedCount();
-  $("#doneMsg").textContent="Você praticou "+(kind==="speak"?"a pronúncia":"o vocabulário")+" hoje. Continue amanhã para manter a sequência!";
+  const msg={learn:"o vocabulário",speak:"a pronúncia",quiz:"o vocabulário",listen:"a escuta",type:"a escrita"}[kind]||"inglês";
+  $("#doneMsg").textContent="Você praticou "+msg+" hoje. Continue amanhã para manter a sequência!";
   show("scDone");
+}
+
+let listenList=[],li=0,listenScore=0;
+function startListen(){listenList=pick(Math.max(6,save.goalMin*2));li=0;listenScore=0;trackMode("listen");if(!listenList.length){toast("Nada para ouvir por hoje!");goHome();return}show("scListen");renderListen()}
+function renderListen(){
+  if(li>=listenList.length){finish("listen");return}
+  const w=listenList[li];
+  $("#listenCount").textContent=(li+1)+" / "+listenList.length;
+  $("#listenBar").style.width=(li/listenList.length*100)+"%";
+  $("#listenScore").textContent=listenScore+" acertos";
+  $("#listenFeedback").classList.add("hidden");
+  $("#listenInput").value="";$("#listenInput").disabled=false;$("#listenSend").disabled=false;
+  $("#listenHint").textContent="Toque em 🔊 para ouvir e escreva em inglês.";
+  setTimeout(()=>speak(w.en),300);
+}
+function checkListen(){
+  const w=listenList[li],val=$("#listenInput").value.trim();
+  if(!val){toast("Escreva o que ouviu.");return}
+  const ok=norm(val)===norm(w.en);
+  registerAnswer(w.en,ok);if(ok)listenScore++;
+  beep(ok?740:280);
+  $("#listenResult").textContent=ok?"Acertou! ✅":"Quase! A resposta era:";
+  $("#listenAnswer").textContent=w.en+" — "+w.pt;
+  $("#listenFeedback").classList.remove("hidden");
+  $("#listenScore").textContent=listenScore+" acertos";
+  $("#listenInput").disabled=true;$("#listenSend").disabled=true;
+}
+
+let typeList=[],ti=0,typeScore=0;
+function startType(){typeList=pick(Math.max(6,save.goalMin*2));ti=0;typeScore=0;trackMode("type");if(!typeList.length){toast("Nada para digitar por hoje!");goHome();return}show("scType");renderType()}
+function renderType(){
+  if(ti>=typeList.length){finish("type");return}
+  const w=typeList[ti];
+  $("#typeCount").textContent=(ti+1)+" / "+typeList.length;
+  $("#typeBar").style.width=(ti/typeList.length*100)+"%";
+  $("#typeScore").textContent=typeScore+" acertos";
+  $("#typePt").textContent=w.pt;
+  $("#typeEx").textContent='Dica: começa com "'+w.en.charAt(0).toUpperCase()+'" e tem '+w.en.length+" letras";
+  $("#typeFeedback").classList.add("hidden");
+  $("#typeInput").value="";$("#typeInput").disabled=false;$("#typeSend").disabled=false;$("#typeInput").focus();
+}
+function checkType(){
+  const w=typeList[ti],val=$("#typeInput").value.trim();
+  if(!val){toast("Escreva a resposta.");return}
+  const ok=norm(val)===norm(w.en);
+  registerAnswer(w.en,ok);if(ok)typeScore++;
+  beep(ok?740:280);
+  $("#typeResult").textContent=ok?"Acertou! ✅":"A resposta era:";
+  $("#typeAnswer").textContent=w.en;
+  $("#typeFeedback").classList.remove("hidden");
+  $("#typeScore").textContent=typeScore+" acertos";
+  $("#typeInput").disabled=true;$("#typeSend").disabled=true;
+}
+
+function openGrammar(){renderGrammar();show("scGrammar")}
+function renderGrammar(){
+  const box=$("#grammarList");box.innerHTML="";
+  GRAMMAR.forEach(g=>{
+    const el=document.createElement("div");el.className="lesson-item";
+    el.innerHTML='<div class="emoji">'+g.emoji+'</div><div class="grow"><b>'+g.title+'</b><br><span style="color:var(--muted);font-size:13px">'+g.intro+'</span></div><span style="color:var(--muted)">›</span>';
+    el.onclick=()=>openLesson(g.id);
+    box.appendChild(el);
+  });
+}
+function openLesson(id){
+  const g=GRAMMAR.find(x=>x.id===id);if(!g)return;
+  $("#lessonTitle").textContent=g.title;
+  $("#lessonIntro").textContent=g.intro;
+  $("#lessonPoints").innerHTML=g.points.map(p=>"<li>"+p+"</li>").join("");
+  const box=$("#lessonExamples");box.innerHTML="";
+  g.examples.forEach(e=>{
+    const el=document.createElement("div");el.className="ex-line";
+    el.innerHTML='<div><b style="color:var(--ink)">'+e.en+'</b><br><span style="color:var(--muted);font-size:13px">'+e.pt+'</span></div>';
+    const b=document.createElement("button");b.className="ghost";b.textContent="🔊";b.setAttribute("aria-label","Ouvir");
+    b.onclick=()=>speak(e.en);
+    el.appendChild(b);box.appendChild(el);
+  });
+  show("scLesson");
+}
+
+function openBadges(){
+  const grid=$("#badgesGrid");grid.innerHTML="";
+  BADGES.forEach(b=>{
+    const got=!!save.badges[b.id];
+    const el=document.createElement("div");el.className="badge"+(got?"":" locked");
+    el.innerHTML='<span class="b-emoji">'+(got?b.emoji:"🔒")+'</span><b>'+b.title+'</b><span>'+b.desc+'</span>';
+    grid.appendChild(el);
+  });
+  $("#badgesCount").textContent=Object.keys(save.badges).length+" / "+BADGES.length;
+  show("scBadges");
+}
+
+function openProfile(){
+  $("#profName").textContent=save.name?("Olá, "+save.name+"!"):"Olá!";
+  const li=levelInfo(save.xp);
+  $("#profLeague").textContent=li.league+" · Nível "+li.level;
+  $("#profXp").textContent=save.xp;
+  $("#profStreak").textContent=save.streak;
+  $("#profWords").textContent=learnedCount();
+  $("#profSessions").textContent=save.sessions;
+  $("#profBadges").textContent=Object.keys(save.badges).length;
+  $("#profFreezes").textContent=save.freezes;
+  show("scProfile");
+}
+
+function exportSave(){
+  try{
+    const blob=new Blob([JSON.stringify(save,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download="finn-english-progresso.json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),2000);toast("Backup exportado ⬇️");
+  }catch(e){toast("Não foi possível exportar")}
+}
+function importSave(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const p=JSON.parse(r.result);const d=defaultSave();
+      save=Object.assign(d,p);
+      save.settings=Object.assign(d.settings,p.settings||{});
+      save.daily=Object.assign(d.daily,p.daily||{});
+      save.badges=p.badges||{};save.flags=p.flags||{};
+      if(save.freezes==null)save.freezes=2;
+      migrateWords();persist();applyTheme();toast("Progresso importado! ⬆️");goHome();
+    }catch(e){toast("Arquivo inválido")}
+  };
+  r.readAsText(file);
+}
+function shareProgress(){
+  const li=levelInfo(save.xp);
+  const txt="Estou no nível "+li.level+" ("+li.league+") aprendendo inglês com o Finn English! 🦊 "+learnedCount()+" palavras aprendidas e "+save.streak+" dias de sequência. 🔥";
+  if(navigator.share){navigator.share({title:"Finn English",text:txt,url:location.href}).catch(()=>{})}
+  else copyText(txt+" "+location.href);
+}
+
+function applyTheme(){document.documentElement.setAttribute("data-theme",save.settings.dark?"dark":"light")}
+function scheduleReminder(){
+  if(save.settings.reminder&&"Notification"in window&&Notification.permission!=="granted"){
+    Notification.requestPermission().catch(()=>{});
+  }
 }
 
 let onb={step:0,name:"",level:"basic",goalMin:10};
@@ -974,23 +1568,50 @@ function initSettings(){
   $("#setSound").textContent=save.settings.sound?"Ligado":"Desligado";
   $("#setSound").classList.toggle("sel",save.settings.sound);
   $("#setSound").onclick=()=>{save.settings.sound=!save.settings.sound;$("#setSound").textContent=save.settings.sound?"Ligado":"Desligado";$("#setSound").classList.toggle("sel",save.settings.sound)};
+  $("#setDark").textContent=save.settings.dark?"Ligado":"Desligado";
+  $("#setDark").classList.toggle("sel",save.settings.dark);
+  $("#setDark").onclick=()=>{save.settings.dark=!save.settings.dark;$("#setDark").textContent=save.settings.dark?"Ligado":"Desligado";$("#setDark").classList.toggle("sel",save.settings.dark);applyTheme()};
+  const syncRemind=()=>{$("#setRemind").textContent=save.settings.reminder?"Ligado":"Desligado";$("#setRemind").classList.toggle("sel",save.settings.reminder);$("#setRemindRow").style.display=save.settings.reminder?"flex":"none";$("#setRemindTime").value=save.settings.reminderTime||"19:00"};
+  syncRemind();
+  $("#setRemind").onclick=()=>{save.settings.reminder=!save.settings.reminder;syncRemind();if(save.settings.reminder)scheduleReminder()};
+  $("#setRemindTime").oninput=()=>{save.settings.reminderTime=$("#setRemindTime").value.trim()};
+  const syncPro=()=>{$("#setProStatus").textContent=save.pro?"Pro ✅":"Grátis";$("#setProCode").value="";$("#setProCode").placeholder=save.pro?"Código Pro ativo":"Código Pro (ex.: FINN2026)"};
+  syncPro();
+  $("#setProApply").onclick=()=>{
+    const code=($("#setProCode").value||"").trim().toUpperCase();
+    if(!code){toast("Digite um código.");return}
+    if(code==="FINN2026"||code==="FINNPRO"||code==="APOIO"){save.pro=true;persist();syncPro();toast("Versão Pro ativada! 🎉")}
+    else toast("Código inválido");
+  };
+  $("#setExport").onclick=exportSave;
+  $("#setImport").onclick=()=>$("#setFile").click();
+  $("#setFile").onchange=e=>{const f=e.target.files[0];if(f)importSave(f)};
   $("#setSave").onclick=()=>{
     save.name=$("#setName").value.trim()||save.name;
     const sel=$("#setGoal .chip.sel");if(sel)save.goalMin=parseInt(sel.dataset.v,10);
     persist();toast("Ajustes salvos");goHome();
   };
-  $("#setReset").onclick=()=>{if(confirm("Apagar todo o progresso?")){localStorage.removeItem(KEY);save=defaultSave();toast("Progresso apagado");location.reload()}};
+  $("#setReset").onclick=()=>{if(confirm("Apagar todo o progresso?")){localStorage.removeItem(KEY);save=defaultSave();applyTheme();toast("Progresso apagado");location.reload()}};
 }
 
 function init(){
   load();
+  applyTheme();
   initOnboard();
   $("#goLearn").onclick=startLearn;
   $("#goSpeak").onclick=startSpeak;
   $("#goQuiz").onclick=startQuiz;
   $("#goTalk").onclick=openTalk;
+  $("#goListen").onclick=startListen;
+  $("#goType").onclick=startType;
+  $("#goGrammar").onclick=openGrammar;
+  $("#goMistakes").onclick=startMistakes;
+  $("#goBadges").onclick=openBadges;
+  $("#goProfile").onclick=openProfile;
   $("#goSettings").onclick=()=>{initSettings();show("scSettings")};
   $("#goSupport").onclick=openSupport;
+  $("#phraseHear").onclick=()=>speak(dailyPhrase().en);
+  $("#phraseShare").onclick=shareProgress;
   $("#learnBack").onclick=goHome;
   $("#learnYes").onclick=()=>answerLearn(true);
   $("#learnNo").onclick=()=>answerLearn(false);
@@ -1007,16 +1628,34 @@ function init(){
   $("#dlgSend").onclick=()=>{const v=$("#dlgText").value.trim();if(!v){toast("Escreva ou fale sua resposta.");return}showFeedback(v)};
   $("#dlgText").onkeydown=e=>{if(e.key==="Enter")$("#dlgSend").click()};
   $("#dlgNext").onclick=()=>{dlg.i++;renderDialog()};
+  $("#typeBack").onclick=goHome;
+  $("#typeSend").onclick=checkType;
+  $("#typeNext").onclick=()=>{ti++;renderType()};
+  $("#typeInput").onkeydown=e=>{if(e.key==="Enter")checkType()};
+  $("#listenBack").onclick=goHome;
+  $("#listenPlay").onclick=()=>speak(listenList[li]?listenList[li].en:"");
+  $("#listenSend").onclick=checkListen;
+  $("#listenNext").onclick=()=>{li++;renderListen()};
+  $("#listenInput").onkeydown=e=>{if(e.key==="Enter")checkListen()};
+  $("#gramBack").onclick=goHome;
+  $("#lessonBack").onclick=openGrammar;
+  $("#badgesBack").onclick=goHome;
+  $("#profBack").onclick=goHome;
+  $("#profShare").onclick=shareProgress;
+  $("#profExport").onclick=exportSave;
+  $("#profImport").onclick=()=>$("#profFile").click();
+  $("#profFile").onchange=e=>{const f=e.target.files[0];if(f)importSave(f)};
   $("#setBack").onclick=goHome;
   $("#setSupport").onclick=openSupport;
   $("#supBack").onclick=goHome;
   $("#doneHome").onclick=goHome;
-  $("#doneAgain").onclick=()=>{({learn:startLearn,speak:startSpeak,quiz:startQuiz,talk:openTalk})[lastKind]()};
+  $("#doneAgain").onclick=()=>{({learn:startLearn,speak:startSpeak,quiz:startQuiz,talk:openTalk,listen:startListen,type:startType})[lastKind]()};
   $$("#tabbar button").forEach(b=>b.onclick=()=>{
     if(!save.onboarded){toast("Termine o cadastro primeiro");return}
     ({home:goHome,learn:startLearn,speak:startSpeak,quiz:startQuiz,talk:openTalk})[b.dataset.tab]();
   });
   if(save.onboarded)goHome();else show("scOnboard");
+  scheduleReminder();
   if("serviceWorker"in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 }
 document.addEventListener("DOMContentLoaded",init);

@@ -1,4 +1,4 @@
-const CACHE = "finn-english-v4";
+const CACHE = "finn-english-v5";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg", "./qrcode.min.js"];
 
 self.addEventListener("install", (event) => {
