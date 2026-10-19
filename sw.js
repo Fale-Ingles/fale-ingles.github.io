@@ -1,4 +1,4 @@
-const CACHE = "finn-english-v6";
+const CACHE = "finn-english-v7";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg", "./qrcode.min.js"];
 
 self.addEventListener("install", (event) => {
@@ -18,13 +18,15 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   const isDoc = req.mode === "navigate" || (req.headers.get("accept") || "").includes("text/html");
   if (isDoc) {
-    event.respondWith(
-      fetch(req).then((res) => {
+    event.respondWith((async () => {
+      const cached = await caches.match(req);
+      const network = fetch(req).then((res) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
         return res;
-      }).catch(() => caches.match(req).then((c) => c || caches.match("./index.html")))
-    );
+      }).catch(() => null);
+      return cached || (await network) || (await caches.match("./index.html")) || new Response("Offline", { status: 503 });
+    })());
     return;
   }
   event.respondWith(

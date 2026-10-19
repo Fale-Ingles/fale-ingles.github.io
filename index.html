@@ -36,13 +36,12 @@
       radial-gradient(760px 520px at -12% 4%, rgba(124,58,237,.2), transparent 55%),
       radial-gradient(640px 640px at 50% 118%, rgba(99,102,241,.16), transparent 60%),
       linear-gradient(180deg,#faf7ff,#efeafb 70%);
-    background-attachment:fixed;
   }
   h1,h2,.brandmark b,.big,.word-en,.word-pt,.score,.stat .box b,.ring>div{font-family:"Baloo 2","Inter",ui-rounded,system-ui,sans-serif}
   #app{max-width:640px;margin:0 auto;padding:20px 16px 120px}
-  .screen{display:none;animation:fade .3s cubic-bezier(.2,.7,.3,1)}
+  .screen{display:none;animation:fade .16s cubic-bezier(.2,.7,.3,1)}
   .screen.on{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   h1{font-size:27px;margin:10px 0;letter-spacing:-.4px;font-weight:800}
   h2{font-size:20px;margin:8px 0;letter-spacing:-.2px;font-weight:800}
   p{line-height:1.55;color:var(--muted);margin:8px 0}
@@ -66,9 +65,15 @@
     font:inherit;font-weight:700;cursor:pointer;border:none;border-radius:16px;padding:14px 18px;
     background:var(--grad-brand);color:#fff;letter-spacing:.2px;
     box-shadow:0 12px 24px -12px rgba(124,58,237,.85);
-    transition:transform .08s ease,box-shadow .2s ease,filter .2s ease;
+    transition:transform .08s ease,box-shadow .2s ease;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent;
   }
-  button:hover{filter:brightness(1.05)}
+  @media (hover:hover){
+    button:hover{filter:brightness(1.05)}
+    .chip:hover{transform:translateY(-1px)}
+    .deck:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+    .lesson-item:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  }
   button:active{transform:translateY(1px) scale(.985)}
   button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none;filter:none}
   button:focus-visible{outline:3px solid rgba(124,58,237,.4);outline-offset:2px}
@@ -83,8 +88,7 @@
   .opt.right{border-color:var(--ok);background:#e9fbef}
   .opt.wrong{border-color:var(--bad);background:#ffecef}
   .chips{display:flex;gap:9px;flex-wrap:wrap}
-  .chip{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow-sm);transition:.16s}
-  .chip:hover{transform:translateY(-1px)}
+  .chip{border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:var(--shadow-sm);transition:transform .16s,box-shadow .16s}
   .chip.sel{border-color:transparent;background:var(--grad-brand);color:#fff;box-shadow:0 12px 24px -12px rgba(124,58,237,.85)}
   .stat{display:flex;gap:12px;flex-wrap:wrap}
   .stat .box{flex:1;min-width:90px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 10px;text-align:center;box-shadow:var(--shadow-sm)}
@@ -108,8 +112,7 @@
   .score{font-size:46px;font-weight:800;background:var(--grad-brand);-webkit-background-clip:text;background-clip:text;color:transparent}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(24px);background:linear-gradient(135deg,#0b1220,#1e293b);color:#fff;padding:13px 20px;border-radius:16px;opacity:0;pointer-events:none;transition:.28s;z-index:50;font-weight:600;box-shadow:0 20px 44px -16px rgba(15,23,42,.7)}
   .toast.on{opacity:1;transform:translateX(-50%)}
-  .deck{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0;box-shadow:var(--shadow-sm);transition:.16s}
-  .deck:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .deck{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0;box-shadow:var(--shadow-sm);transition:transform .16s,box-shadow .16s}
   .deck .emoji{font-size:24px;width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#faf5ff,#fdf2f8)}
   .deck b{display:block;font-weight:700}
   .deck span{font-size:12px;color:var(--muted)}
@@ -120,7 +123,7 @@
   .dots i{width:9px;height:9px;border-radius:50%;background:#cbd5e1;transition:.25s}
   .dots i.on{width:24px;border-radius:999px;background:var(--grad-brand)}
   .foot{position:fixed;left:0;right:0;bottom:0;padding:0 12px calc(12px + env(safe-area-inset-bottom));z-index:40}
-  .foot .inner{max-width:616px;margin:0 auto;display:flex;gap:6px;padding:8px;background:rgba(255,255,255,.82);backdrop-filter:blur(16px) saturate(140%);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+  .foot .inner{max-width:616px;margin:0 auto;display:flex;gap:6px;padding:8px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
   .foot button{flex:1;background:transparent;color:var(--muted);font-weight:700;padding:11px 6px;font-size:12px;border-radius:16px;box-shadow:none;letter-spacing:.2px}
   .foot button:hover{filter:none}
   .foot button.on{color:#fff;background:var(--grad-brand);box-shadow:0 12px 24px -12px rgba(124,58,237,.9)}
@@ -130,8 +133,7 @@
   .badge .b-emoji{font-size:30px;display:block}
   .badge b{display:block;font-size:13px;margin-top:6px}
   .badge span{font-size:11px;color:var(--muted)}
-  .lesson-item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0;box-shadow:var(--shadow-sm);cursor:pointer;transition:.16s}
-  .lesson-item:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .lesson-item{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin:10px 0;box-shadow:var(--shadow-sm);cursor:pointer;transition:transform .16s,box-shadow .16s}
   .lesson-item .emoji{font-size:22px;width:44px;height:44px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#faf5ff,#fdf2f8)}
   ul.lesson-points{line-height:1.7;color:var(--muted);padding-left:18px;margin:8px 0}
   ul.lesson-points li{margin:4px 0}
@@ -1001,8 +1003,25 @@ function applyStreakFreeze(){
 }
 
 let audioCtx=null;
-function beep(freq,dur){if(!save.settings.sound)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;o.type="sine";g.gain.value=.06;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+(dur||.12))}catch(e){}}
-function speak(text){if(!save.settings.sound||!("speechSynthesis"in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=.95;speechSynthesis.speak(u)}catch(e){}}
+function beep(freq,dur){if(!save.settings.sound)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;o.type="sine";g.gain.value=.06;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+(dur||.12))}catch(e){}}
+let voiceEN=null,voicesReady=false;
+function pickVoice(){
+  if(!("speechSynthesis"in window))return;
+  const vs=speechSynthesis.getVoices()||[];
+  if(!vs.length)return;
+  voiceEN=vs.find(v=>/en[-_]US/i.test(v.lang)&&/female|samantha|google us|zira|aria|jenny/i.test(v.name))||vs.find(v=>/en[-_]US/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang))||null;
+  voicesReady=true;
+}
+if("speechSynthesis"in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(text){if(!save.settings.sound||!("speechSynthesis"in window)||!text)return;try{
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";u.rate=.95;
+  if(voiceEN)u.voice=voiceEN;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  if(!voicesReady){pickVoice()}
+}catch(e){}}
+function warmAudio(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}if("speechSynthesis"in window&&!voicesReady)pickVoice()}
 let toastT=null;
 function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("on"),1800)}
 
@@ -1151,11 +1170,13 @@ function startRecog(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){toast("Reconhecimento de voz indisponível neste navegador.");return}
   const s=speakList[spi];
-  recog=new SR();recog.lang="en-US";recog.interimResults=false;recog.maxAlternatives=1;
+  recog=new SR();recog.lang="en-US";recog.interimResults=true;recog.maxAlternatives=1;
   const mic=$("#speakMic");mic.classList.add("rec");mic.disabled=true;
   $("#speakHint").textContent="Ouvindo... fale agora!";
   recog.onresult=e=>{
-    const said=e.results[0][0].transcript;
+    const res=e.results[e.results.length-1];
+    if(!res.isFinal){$("#speakHint").textContent="“"+res[0].transcript+"…”";return}
+    const said=res[0].transcript;
     const score=similarity(said,s.en);
     $("#speakSaid").textContent=said;
     $("#speakScore").textContent=score+"%";
@@ -1352,10 +1373,14 @@ function showFeedback(said){
 function startDialogRecog(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){toast("Reconhecimento de voz indisponível neste navegador.");return}
-  const r=new SR();r.lang="en-US";r.interimResults=false;r.maxAlternatives=1;
+  const r=new SR();r.lang="en-US";r.interimResults=true;r.maxAlternatives=1;
   const mic=$("#dlgMic");mic.classList.add("rec");mic.disabled=true;
   $("#dlgHint").textContent="Ouvindo... fale agora!";
-  r.onresult=e=>{showFeedback(e.results[0][0].transcript)};
+  r.onresult=e=>{
+    const res=e.results[e.results.length-1];
+    if(!res.isFinal){$("#dlgHint").textContent="“"+res[0].transcript+"…”";return}
+    showFeedback(res[0].transcript);
+  };
   r.onerror=()=>{$("#dlgHint").textContent="Não consegui ouvir. Tente de novo."};
   r.onend=()=>{mic.classList.remove("rec");mic.disabled=false};
   try{r.start()}catch(e){mic.classList.remove("rec");mic.disabled=false}
@@ -1579,6 +1604,8 @@ function initSettings(){
 function init(){
   load();
   applyTheme();
+  document.addEventListener("pointerdown",warmAudio,{once:true});
+  document.addEventListener("touchstart",warmAudio,{once:true,passive:true});
   initOnboard();
   $("#goLearn").onclick=startLearn;
   $("#goSpeak").onclick=startSpeak;
